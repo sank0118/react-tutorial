@@ -1,31 +1,35 @@
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// const verficationCode = "123123";
+const verificationCode = "123123";
 
-// const Code = () => {
-//   const [code, setCode] = useState("");
+const Code = () => {
+  const [code, setCode] = useState("");
 
-//   const onCheck = () => {
-//     if (code.length === 6 && code === verficationCode) {
-//       return alert("일치하지 않습니다");
-//     }
-//   };
+  const onCheck = () => {
+    if (code.length === 6 && code === verificationCode) {
+      return alert("ㅊㅋㅊㅋ");
+    }
+    alert("인증번호 6자리를 제대로 입력하세요");
+  };
 
-//   useEffect(() => {}, [code]);
+  useEffect(() => {
+    if (code.length === 6) {
+      onCheck();
+    }
+  }, [code]);
 
-//   return (
-//     <div>
-//       <h1>Code</h1>
-//       <input
-//         type="text"
-//         value={code}
-//         //   onChange={}
-//       />
-//       <button
-//       // onClick={}
-//       ></button>
-//     </div>
-//   );
-// };
+  return (
+    <div>
+      <h1>Code</h1>
+      <input
+        type="text"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+      />
 
-// export default Code;
+      <button onClick={onCheck}>인증</button>
+    </div>
+  );
+};
+
+export default Code;

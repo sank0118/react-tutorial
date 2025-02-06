@@ -8,6 +8,18 @@ const Timer = () => {
     console.log(counting);
   }, [counting]);
 
+  useEffect(() => {
+    if (counting) {
+      const countTime = setInterval(() => {
+        setTime((prev) => (prev === 0 ? 0 : prev - 1));
+      }, 1000);
+
+      return () => {
+        clearInterval(countTime);
+      };
+    }
+  }, [counting]);
+
   return (
     <div>
       <h1>{time}</h1>
