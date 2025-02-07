@@ -1,57 +1,69 @@
 import { useState, useEffect, useRef } from "react";
 
+const initialState = [];
+
 const App = () => {
-  const [value, setValue] = useState("");
+  const [todos, setTodos] = useState(initialState);
+  const [todo, setTodo] = useState("");
 
   const ref = useRef(null);
 
-  const valueRef = useRef(0);
-  //ref = 안보이는 곳에서 열일한느 친구/ 한발 느린 친구
-
-  const valueCheck = () => {
-    if (value.length === 0) {
-      alert("아무것도 입력하지 않았습니다.");
-
-      // ref.current?.focus();
-      const input = document.querySelector("input#myInput");
-      input.focus();
-
-      return;
+  const onSubmit = () => {
+    console.log(todo);
+    if (todo.length === 0) {
+      alert("경고");
+      return ref.current?.focus();
     }
 
-    if (ref.current?.value.length === 0) {
-      alert("아무것도 입력하지 않았습니다.");
-
-      ref.current?.showPicker();
-
-      return;
+    if (todo.length <= 1) {
+      alert("warning");
+      return ref.current?.focus();
     }
 
-    alert(`you just typed: ${value}`);
-    const length = value.length;
-    valueRef.current = length;
+    // setTodos((prev) => {
+    //   return [todo, ...prev];
+    //   //set함수는 무조건 원래의 값과 같은 타입을 return 해줘야함
+    // }); //배열은 무조건 이전값을 다뤄야 함
+    setTodos((prev) => [todo, ...prev]);
+
+    setTodo("");
+    ref.current?.focus();
   };
 
   useEffect(() => {
-    console.log({ value });
-  }, [value]);
+    console.log({ todos });
+  }, [todos]);
 
   return (
     <div>
-      <h1>React Tutorial: {valueRef.current}</h1>
+      <h1>App</h1>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit();
+        }}
+      >
+        <input
+          type="text"
+          value={todo}
+          onChange={(e) => setTodo(e.target.value)}
+          ref={ref}
+        />
+        <button>ADD</button>
+      </form>
+      <ul>
+        {todos.map((todo) => {
+          const onDelete = () =>
+            setTodos((prev) => prev.filter((item) => item !== todo));
 
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        ref={ref}
-        id="myInput"
-      />
-      <select name="" id="" ref={ref}>
-        <option value="">a</option>
-        <option value="">b</option>
-      </select>
-      <button onClick={valueCheck}>value check</button>
+          return (
+            <li key={todo}>
+              {todo}
+              <button onClick={onDelete}>삭제</button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 };
