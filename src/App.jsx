@@ -1,9 +1,7 @@
-import React from "react";
-
 const App = () => {
   return (
     <div>
-      <h1>React-Tutorial1</h1>
+      <h1>App</h1>
     </div>
   );
 };
