@@ -21,6 +21,55 @@ const a3: S = "a";
 const a4: S = "a";
 const a5: S = "a";
 
+interface Basic {
+  name: string;
+  age: number;
+}
+
+//!extends 확장
+//!extends 문법으로 다른 인터페이스를 가져왔을때 해당 인터페이스 안에 값과 타입이 겹치는 것은 가능하지만 타입이 다르게 지정할 수 없다.
+interface Person extends Basic {
+  isMale: boolean;
+}
+
+type StudentInfo = {
+  age: number;
+  name: string;
+};
+type StudentID = {
+  id: number;
+};
+
+//! type을 쓰려면 객체의 형태로 담은 type만 사용가능
+
+//! & trtpe에서 "그리고"라는 뜻
+
+type student = StudentInfo &
+  StudentID & {
+    level: string;
+  };
+
+type ClassID = {
+  id: 1 | 2 | 3 | 4 | 5 | 0;
+};
+type StudentName = "강산" | "유경환" | "김영화" | "허승이" | "";
+//! string,number,boolean,null,[] 등의 직접적인 값을 주지 않고 옵션을 주고 싶을때는
+//! 타입 부분에 직접적인 값을 입력하면 된다. 여러 개의 값은 |로 구분하고 빈 문자열이나 0 등을 추가하여
+//! 아무런 값이 없을때까지 지정해주면 된다.
+//! 주의사항: 옵션을 지정할 때는 string,number, 등의 직접적인 타입을 함께 주지 않는다.
+interface ClassStudent extends ClassID {
+  name: StudentName;
+  mobile: string;
+}
+
+const s1: ClassStudent = {
+  name: "",
+  mobile: "",
+  id: 0,
+};
+
+const names: StudentName[] = ["강산" | "유경환" | "김영화" | "허승이"];
+
 type B = boolean;
 const b1: B = true;
 const b2: B = false;
