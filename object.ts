@@ -68,7 +68,7 @@ const s1: ClassStudent = {
   id: 0,
 };
 
-const names: StudentName[] = ["강산" | "유경환" | "김영화" | "허승이"];
+const names: StudentName[] = [""];
 
 type B = boolean;
 const b1: B = true;
@@ -86,7 +86,9 @@ const n5: N = 5;
 
 type Person = {
   name: string;
+
   age: number;
+
   isMale: boolean;
 };
 
