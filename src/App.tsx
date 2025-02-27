@@ -1,45 +1,33 @@
-import { useState, useEffect } from "react";
-
-type Person = {
-  name: string;
-  age: number;
-};
-
-type Pet = {
-  name: string;
-  age: number;
-  weight: number;
-  desexed: boolean;
-};
+import { Container, Button, Text, Form } from "./ui";
 
 const App = () => {
-  const [a, setA] = useState<string>("");
-  const [b, setB] = useState<number>(0);
-
-  const [pet1, setPet1] = useState<Pet>({
-    name: "바둑이",
-    age: 3,
-    weight: 4,
-    desexed: true,
-  });
-  const [p1, setP1] = useState<Person>({
-    name: "KS",
-    age: 26,
-  });
-
-  const [pets, setPets] = useState<Pet[]>([]);
-  const [people, setPeople] = useState<Person[]>([]);
-
-  useEffect(() => {
-    return () => {
-      setPets((prev) => [...prev, pet1]);
-      setPeople((prev) => [...prev, p1]);
-    };
-  }, []);
-
   return (
     <div>
-      <h1>App</h1>
+      <Text.H1 className="text-red-600">App</Text.H1>
+      <Text.H2 className="text-yellow-400">App</Text.H2>
+      <Text.P>App</Text.P>
+
+      <Container.Col className="border gap-y-5">
+        <p>123123</p>
+        <p>123123</p>
+      </Container.Col>
+
+      <Container.Row>
+        <p>123123</p>
+        <p>123123</p>
+      </Container.Row>
+      <Button.Opacity className="bg-sky-500 hover:bg-sky-400">
+        Opacity Button
+      </Button.Opacity>
+      <Button.Pressable className="bg-teal-600">
+        Pressable Button
+      </Button.Pressable>
+
+      <Form.Form onSubmit={() => console.log("submit...")}>
+        <Form.Label htmlFor="rt">random text</Form.Label>
+        <Form.Text id="rt" />
+        <Button.Spring className="bg-red-600">Pressable Button</Button.Spring>
+      </Form.Form>
     </div>
   );
 };
