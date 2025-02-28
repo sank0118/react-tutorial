@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { v4 } from "uuid";
 import { FaRegTrashCan, FaRotate, FaPlus } from "react-icons/fa6";
 import { Button, Container, Form } from "../ui";
@@ -13,15 +13,20 @@ interface Props {
 }
 
 const RForm = ({ onCancel, onDone, payload }: Props) => {
-  const [requirement, setRequirement] = useState<Requirement>(
-    payload ?? {
+  const initialState = useMemo<Requirement>(() => {
+    if (payload) {
+      return payload;
+    }
+    return {
       descs: [],
       id: v4(),
       manager: "",
       status: "",
       title: "",
-    }
-  );
+    };
+  }, [payload]);
+
+  const [requirement, setRequirement] = useState("");
 
   const [isInsertingDesc, setIsInsertingDesc] = useState<boolean>(false); // 내가 지금 작성하고 있는 아이템이 desc인지 확인용
 
@@ -35,29 +40,49 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
   const managerRef = useRef<HTMLSelectElement>(null); // 내가 연결하고 싶은 태그를 제네릭으로 전달
   const managerRef2 = useRef<HTMLInputElement>(null); // 내가 연결하고 싶은 태그를 제네릭으로 전달
 
-  const onSubmit = () => {
+  const titleMessage = useMemo(() => {
+    if (requirement.title.length === 0) {
+      return "기능 이름을 적어주세요.";
+    }
+    if (requirement.title.length > 30) {
+      return "너무 깁니다.";
+    }
+  }, [requirement.title]);
+
+  const statusMeassage = useMemo(() => {
+    if (requirement.status.length === 0) {
+      return "진행상태를 선택해주세요.";
+    }
+  }, [requirement.status]);
+
+  const managerMessage = useMemo(() => {
+    if (requirement.manager.length === 0) {
+      if (directInserting) {
+        return "담당자를 입력해주세요.";
+      }
+
+      return "담당자를 선택해주세요.";
+    }
+  }, [requirement.manager]);
+
+  const onSubmit = useCallback(() => {
     if (isInsertingDesc) {
       return;
     }
 
-    if (requirement.title.length === 0) {
-      alert("기능 이름을 적어주세요.");
-      return setTimeout(() => titleRef.current?.focus(), 100);
+    if (titleMessage) {
+      alert(titleMessage);
+      return setTimeout(() => titleRef.current?.showPicker());
     }
 
-    if (requirement.status.length === 0) {
-      alert("진행상태를 선택해주세요.");
+    if (statusMeassage) {
+      alert(statusMeassage);
       return setTimeout(() => statusRef.current?.showPicker());
     }
 
-    if (requirement.manager.length === 0) {
-      if (directInserting) {
-        alert("담당자를 입력해주세요.");
-        return setTimeout(() => managerRef2.current?.focus(), 100);
-      }
-
-      alert("담당자를 선택해주세요.");
-      return setTimeout(() => managerRef.current?.showPicker(), 100);
+    if (managerMessage) {
+      alert(managerMessage);
+      return setTimeout(() => managerRef.current?.showPicker());
     }
 
     alert(payload ? "요구사항을 수정했습니다." : "요구사항을 추가했습니다.");
@@ -77,7 +102,15 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
       return;
     }
     onCancel();
-  };
+  }, [
+    isInsertingDesc,
+    titleMessage,
+    titleRef,
+    statusMeassage,
+    statusRef,
+    managerMessage,
+    managerRef,
+  ]);
 
   useEffect(
     () => {
@@ -85,6 +118,10 @@ const RForm = ({ onCancel, onDone, payload }: Props) => {
     },
     [] // 빈배열이란 해당 컴포넌트가 최초 렌데링 되는 시점에 딱 한 번 실행할 코드
   );
+
+  useEffect(() => {
+    console.log("submit함수 랜더링 됨");
+  }, [onSubmit]);
 
   return (
     <Form.Form
