@@ -1,86 +1,11 @@
-import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Container, Typo } from "../components";
-import { dbService } from "../lib";
+import { Alert } from "../contexts";
+import { auth, authService, dbService } from "../lib";
 
 const Home = () => {
-  const [samples, setSamples] = useState<{ text: string; id: string }[]>([]);
-
-  useEffect(() => {
-    const subscribe = dbService.collection("sample").onSnapshot((snap) => {
-      const data = snap.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
-      console.log(data);
-
-      setSamples(data as any[]);
-    });
-
-    subscribe;
-
-    return () => {
-      subscribe;
-    };
-  }, []);
-
-  //! database 지역,날씨,기기,인터넷 속도등에 영향 받음
-  //? async await
-  const onDelete = async (id: string) => {
-    console.log("delete target id", id);
-    const ref = dbService.collection("sample").doc(id);
-    //! trycatch로 감싸서 에러헨들링 하기
-    try {
-      await ref.delete();
-      alert("삭제되었습니다.");
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-
-  const onAdd = async (newText: string) => {
-    try {
-      const ref = dbService.collection("sample");
-
-      await ref.add({ text: newText });
-
-      alert("추가되었습니다.");
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-
-  const onEdit = async (id: string) => {
-    try {
-      const ref = dbService.collection("sample");
-
-      await ref.doc(id).update({ text: "리액트 배우기" });
-
-      alert("수정되었습니다.");
-    } catch (error: any) {
-      alert(error.message);
-    }
-  };
-
-  return (
-    <Container.Col>
-      <Typo.H1>Hello</Typo.H1>
-
-      <Button.Opacity onClick={() => onAdd("새로운 할일1")}>
-        추가
-      </Button.Opacity>
-
-      <ul>
-        {samples.map((sample) => (
-          <li key={sample.id}>
-            <Typo.Text>{sample.text}</Typo.Text>
-            <Button.Opacity onClick={() => onEdit(sample.id)}>
-              리액트배우기로 수정
-            </Button.Opacity>
-            <Button.Opacity onClick={() => onDelete(sample.id)}>
-              삭제
-            </Button.Opacity>
-          </li>
-        ))}
-      </ul>
-    </Container.Col>
-  );
+  const { alert } = Alert.use();
+  const navi = useNavigate();
 
   return (
     <Container.Row className="w-full h-screen justify-center items-center">
@@ -88,9 +13,69 @@ const Home = () => {
         <Typo.H1 className="text-center">
           나만의 사랑을 찾고 커플이 되어 지옥같은 현실에서 탈출하세요.
         </Typo.H1>
-        <Button.Link href={"signup"} className="bg-pink-400 text-white">
+        <Button.Opacity
+          onClick={() =>
+            alert("로그인 하시겠습니까?", [
+              { text: "회원가입", onClick: () => navi("signup") },
+              { text: "로그인", onClick: () => navi("signin") },
+              {
+                text: "구글 로그인",
+                onClick: async () => {
+                  const provider = new auth.GoogleAuthProvider();
+
+                  try {
+                    const res = await authService.signInWithPopup(provider); //! provider
+                    if (res.user) {
+                      const ref = dbService.collection("users");
+                      const userSnap = await ref
+                        .where("email", "==", res.user.email)
+                        .get();
+                      const userData = userSnap.docs;
+                      if (userData.length === 0) {
+                        const newUser: User = {
+                          address: "",
+                          appearance: {
+                            bodyType: "",
+                            height: {
+                              isCM: true,
+                              value: 0,
+                            },
+                            weight: {
+                              value: 0,
+                              isKG: true,
+                            },
+                          },
+                          createdAt: 0,
+                          distance: 0,
+                          dob: "",
+                          drinks: "",
+                          workouts: "",
+                          smokes: "",
+                          email: res.user.email!,
+                          gender: "",
+                          id: res.user.uid,
+                          interests: [],
+                          isVegetarian: false,
+                          mobile: "010",
+                          name: res.user.displayName!,
+                          points: [],
+                          purposes: [],
+                        };
+                        await ref.doc(res.user.uid).set(newUser);
+                      }
+                      alert("환영합니다.");
+                    }
+                  } catch (error: any) {
+                    alert(error.message);
+                  }
+                },
+              },
+            ])
+          }
+          className="bg-pink-400 text-white"
+        >
           탈출하기
-        </Button.Link>
+        </Button.Opacity>
       </Container.Col>
     </Container.Row>
   );
